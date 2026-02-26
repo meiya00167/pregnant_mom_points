@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>孕晚期妈妈积分管理系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #ffeef5 0%, #fff5f8 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #5a4a42;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(255, 182, 193, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ffb6c1 0%, #ffc0cb 100%);
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #fff;
+            font-size: 28px;
+            font-weight: 600;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 10px;
+        }
+
+        .header .subtitle {
+            color: #fff;
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 25px;
+        }
+
+        .points-display {
+            text-align: center;
+            padding: 30px 20px;
+            background: linear-gradient(135deg, #fff0f3 0%, #fff5f8 100%);
+            border-radius: 15px;
+            margin-bottom: 25px;
+        }
+
+        .points-display .points-label {
+            font-size: 18px;
+            color: #888;
+            margin-bottom: 10px;
+        }
+
+        .points-display .points-value {
+            font-size: 56px;
+            font-weight: bold;
+            color: #e91e63;
+            text-shadow: 2px 2px 4px rgba(233, 30, 99, 0.1);
+        }
+
+        .points-display .due-date {
+            font-size: 20px;
+            color: #ff6b9d;
+            margin-top: 15px;
+            font-weight: 500;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 15px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ff6b9d 0%, #ff8a80 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 107, 157, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 157, 0.5);
+        }
+
+        .btn-secondary {
+            background: #fff;
+            color: #ff6b9d;
+            border: 2px solid #ff6b9d;
+        }
+
+        .btn-secondary:hover {
+            background: #fff5f8;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #5a4a42;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #ffc0cb;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #ff6b9d;
+        }
+
+        .admin-link {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .admin-link a {
+            color: #aaa;
+            font-size: 14px;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .admin-link a:hover {
+            color: #ff6b9d;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .modal-header h2 {
+            color: #ff6b9d;
+            font-size: 24px;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 30px;
+            cursor: pointer;
+            color: #aaa;
+            background: none;
+            border: none;
+        }
+
+        .leaderboard-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: #fff5f8;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            transition: transform 0.2s;
+        }
+
+        .leaderboard-item:hover {
+            transform: translateX(5px);
+        }
+
+        .leaderboard-item .rank {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ff6b9d;
+            width: 40px;
+        }
+
+        .leaderboard-item .name {
+            flex: 1;
+            font-size: 18px;
+            margin-left: 15px;
+        }
+
+        .leaderboard-item .points {
+            font-size: 22px;
+            font-weight: bold;
+            color: #e91e63;
+        }
+
+        .admin-member-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .admin-member-item .member-info {
+            flex: 1;
+        }
+
+        .admin-member-item .member-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .admin-member-item .member-points {
+            font-size: 16px;
+            color: #ff6b9d;
+            margin-top: 5px;
+        }
+
+        .btn-add-points {
+            background: #4caf50;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-add-points:hover {
+            background: #45a049;
+        }
+
+        .search-box {
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #ffc0cb;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+
+        .history-list {
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            padding: 12px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .history-item .date {
+            color: #888;
+            font-size: 12px;
+        }
+
+        .history-item .reason {
+            color: #333;
+            margin-top: 5px;
+        }
+
+        .history-item .points {
+            color: #4caf50;
+            font-weight: bold;
+            float: right;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .btn-logout {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .baby-icon {
+            font-size: 30px;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .points-display .points-value {
+                font-size: 48px;
+            }
+
+            .points-display .due-date {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="baby-icon">🤰👶</div>
+            <h1>孕晚期妈妈积分</h1>
+            <p class="subtitle">快乐孕期，积分相伴</p>
+        </div>
+
+        <div class="content">
+            <!-- 登录/注册页面 -->
+            <div id="loginSection">
+                <div class="form-group">
+                    <label>您的昵称</label>
+                    <input type="text" id="nickname" placeholder="请输入您的昵称">
+                </div>
+                <div class="form-group">
+                    <label>预产期</label>
+                    <input type="date" id="dueDate">
+                </div>
+                <button class="btn btn-primary" onclick="saveUserInfo()">开始记录</button>
+            </div>
+
+            <!-- 用户主页 -->
+            <div id="userSection" style="display: none;">
+                <div class="points-display">
+                    <div class="points-label">当前积分</div>
+                    <div class="points-value" id="userPoints">0</div>
+                    <div class="due-date">📅 预产期：<span id="userDueDate"></span></div>
+                </div>
+                <button class="btn btn-primary" onclick="showLeaderboard()">🏆 查看排行榜</button>
+                <button class="btn btn-secondary" onclick="showMyHistory()">📋 我的积分记录</button>
+            </div>
+
+            <!-- 管理员登录 -->
+            <div id="adminLoginSection" style="display: none;">
+                <h2 style="text-align: center; color: #ff6b9d; margin-bottom: 20px;">管理员登录</h2>
+                <div class="form-group">
+                    <label>管理员密码</label>
+                    <input type="password" id="adminPassword" placeholder="请输入管理员密码">
+                </div>
+                <button class="btn btn-primary" onclick="adminLogin()">登录</button>
+                <button class="btn btn-secondary" onclick="showUserSection()">返回</button>
+            </div>
+
+            <!-- 管理员页面 -->
+            <div id="adminSection" style="display: none;">
+                <div class="admin-header">
+                    <h2>管理员后台</h2>
+                    <button class="btn-logout" onclick="adminLogout()">退出登录</button>
+                </div>
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="搜索成员昵称..." oninput="searchMembers()">
+                </div>
+                <div id="adminMembersList"></div>
+            </div>
+
+            <!-- 管理员入口链接 -->
+            <div class="admin-link" id="adminLink">
+                <a href="#" onclick="showAdminLogin()">管理员登录</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 排行榜弹窗 -->
+    <div id="leaderboardModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeLeaderboard()">&times;</button>
+            <div class="modal-header">
+                <h2>🏆 积分排行榜</h2>
+            </div>
+            <div id="leaderboardList"></div>
+        </div>
+    </div>
+
+    <!-- 加分弹窗 -->
+    <div id="addPointsModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeAddPointsModal()">&times;</button>
+            <div class="modal-header">
+                <h2>添加积分</h2>
+            </div>
+            <div class="form-group">
+                <label>成员</label>
+                <input type="text" id="addPointsMember" readonly style="background: #f5f5f5;">
+            </div>
+            <div class="form-group">
+                <label>增加分数</label>
+                <input type="number" id="addPointsValue" placeholder="请输入分数，如：5">
+            </div>
+            <div class="form-group">
+                <label>备注说明</label>
+                <input type="text" id="addPointsReason" placeholder="请输入加分原因，如：知识问答获奖">
+            </div>
+            <button class="btn btn-primary" onclick="submitAddPoints()">确认添加</button>
+        </div>
+    </div>
+
+    <!-- 我的积分记录弹窗 -->
+    <div id="myHistoryModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeMyHistory()">&times;</button>
+            <div class="modal-header">
+                <h2>📋 我的积分记录</h2>
+            </div>
+            <div id="myHistoryList" class="history-list"></div>
+        </div>
+    </div>
+
+    <script>
+        // 数据存储键名
+        const STORAGE_KEYS = {
+            MEMBERS: 'pregnantMom_members',
+            CURRENT_USER: 'pregnantMom_currentUser',
+            ADMIN_PASSWORD: 'pregnantMom_adminPassword'
+        };
+
+        // 初始化
+        function init() {
+            try {
+                // 初始化管理员密码
+                if (!localStorage.getItem(STORAGE_KEYS.ADMIN_PASSWORD)) {
+                    localStorage.setItem(STORAGE_KEYS.ADMIN_PASSWORD, 'mama666');
+                    console.log('管理员密码已初始化为：mama666');
+                } else {
+                    console.log('管理员密码已存在');
+                }
+
+                // 检查是否已登录
+                const currentUser = localStorage.getItem(STORAGE_KEYS.CURRENT_USER);
+                if (currentUser) {
+                    showUserSection();
+                } else {
+                    showLoginSection();
+                }
+            } catch (error) {
+                console.error('初始化失败:', error);
+                alert('页面初始化失败，请刷新页面重试');
+            }
+        }
+
+        // 保存用户信息
+        function saveUserInfo() {
+            const nickname = document.getElementById('nickname').value.trim();
+            const dueDate = document.getElementById('dueDate').value;
+
+            if (!nickname) {
+                alert('请输入您的昵称');
+                return;
+            }
+
+            if (!dueDate) {
+                alert('请选择预产期');
+                return;
+            }
+
+            // 获取现有成员
+            let members = JSON.parse(localStorage.getItem(STORAGE_KEYS.MEMBERS) || '[]');
+
+            // 检查是否已存在该昵称的成员
+            let member = members.find(m => m.nickname === nickname);
+
+            if (member) {
+                // 更新现有成员
+                member.dueDate = dueDate;
+            } else {
+                // 创建新成员
+                member = {
+                    id: Date.now(),
+                    nickname: nickname,
+                    dueDate: dueDate,
+                    points: 0,
+                    history: []
+                };
+                members.push(member);
+            }
+
+            // 保存成员数据
+            localStorage.setItem(STORAGE_KEYS.MEMBERS, JSON.stringify(members));
+
+            // 保存当前用户
+            localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(member));
+
+            alert('保存成功！');
+            showUserSection();
+        }
+
+        // 显示用户页面
+        function showUserSection() {
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('userSection').style.display = 'block';
+            document.getElementById('adminLoginSection').style.display = 'none';
+            document.getElementById('adminSection').style.display = 'none';
+            document.getElementById('adminLink').style.display = 'block';
+
+            updateUserInfo();
+        }
+
+        // 显示登录页面
+        function showLoginSection() {
+            document.getElementById('loginSection').style.display = 'block';
+            document.getElementById('userSection').style.display = 'none';
+            document.getElementById('adminLoginSection').style.display = 'none';
+            document.getElementById('adminSection').style.display = 'none';
+            document.getElementById('adminLink').style.display = 'block';
+        }
+
+        // 更新用户信息显示
+        function updateUserInfo() {
+            const currentUser = JSON.parse(localStorage.getItem(STORAGE_KEYS.CURRENT_USER));
+            if (!currentUser) return;
+
+            // 从成员列表中获取最新数据
+            const members = JSON.parse(localStorage.getItem(STORAGE_KEYS.MEMBERS) || '[]');
+            const member = members.find(m => m.id === currentUser.id);
+
+            if (member) {
+                document.getElementById('userPoints').textContent = member.points;
+                document.getElementById('userDueDate').textContent = member.dueDate;
+
+                // 更新当前用户数据
+                localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(member));
+            }
+        }
+
+        // 显示排行榜
+        function showLeaderboard() {
+            const members = JSON.parse(localStorage.getItem(STORAGE_KEYS.MEMBERS) || '[]');
+            const sortedMembers = members.sort((a, b) => b.points - a.points);
+
+            let html = '';
+            sortedMembers.forEach((member, index) => {
+                let rankIcon = '';
+                if (index === 0) rankIcon = '🥇';
+                else if (index === 1) rankIcon = '🥈';
+                else if (index === 2) rankIcon = '🥉';
+                else rankIcon = (index + 1);
+
+                html += `
+                    <div class="leaderboard-item">
+                        <div class="rank">${rankIcon}</div>
+                        <div class="name">${member.nickname}</div>
+                        <div class="points">${member.points}</div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('leaderboardList').innerHTML = html;
+            document.getElementById('leaderboardModal').classList.add('show');
+        }
+
+        // 关闭排行榜
+        function closeLeaderboard() {
+            document.getElementById('leaderboardModal').classList.remove('show');
+        }
+
+        // 显示我的积分记录
+        function showMyHistory() {
+            const currentUser = JSON.parse(localStorage.getItem(STORAGE_KEYS.CURRENT_USER));
+            if (!currentUser) return;
+
+            const members = JSON.parse(localStorage.getItem(STORAGE_KEYS.MEMBERS) || '[]');
+            const member = members.find(m => m.id === currentUser.id);
+
+            if (!member || !member.history || member.history.length === 0) {
+                document.getElementById('myHistoryList').innerHTML = '<p style="text-align:center; color:#888;">暂无积分记录</p>';
+            } else {
+                let html = '';
+                member.history.forEach(item => {
+                    html += `
+                        <div class="history-item">
+                            <div class="date">${item.date}</div>
+                            <div class="reason">${item.reason}</div>
+                            <div class="points">+${item.points}</div>
+                        </div>
+                    `;
+                });
+                document.getElementById('myHistoryList').innerHTML = html;
+            }
+
+            document.getElementById('myHistoryModal').classList.add('show');
+        }
+
+        // 关闭我的积分记录
+        function closeMyHistory() {
+            document.getElementById('myHistoryModal').classList.remove('show');
+        }
+
+        // 显示管理员登录
+        function showAdminLogin() {
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('userSection').style.display = 'none';
+            document.getElementById('adminLoginSection').style.display = 'block';
+            document.getElementById('adminSection').style.display = 'none';
+            document.getElementById('adminLink').style.display = 'none';
+        }
+
+        // 管理员登录
+        function adminLogin() {
+            const password = document.getElementById('adminPassword').value;
+            const correctPassword = localStorage.getItem(STORAGE_KEYS.ADMIN_PASSWORD);
+
+            console.log('输入密码:', password);
+            console.log('正确密码:', correctPassword);
+
+            if (password === correctPassword) {
+                showAdminSection();
+                document.getElementById('adminPassword').value = '';
+            } else {
+                alert('密码错误，请重新输入。正确密码是：mama666');
+            }
+        }
+
+        // 显示管理员页面
+        function showAdminSection() {
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('userSection').style.display = 'none';
+            document.getElementById('adminLoginSection').style.display = 'none';
+            document.getElementById('adminSection').style.display = 'block';
+            document.getElementById('adminLink').style.display = 'none';
+
+            loadAdminMembers();
+        }
+
+        // 加载管理员成员列表
+        function loadAdminMembers() {
+            const members = JSON.parse(localStorage.getItem(STORAGE_KEYS.MEMBERS) || '[]');
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+
+            const filteredMembers = members.filter(member =>
+                member.nickname.toLowerCase().includes(searchTerm)
+            );
+
+            let html = '';
+            if (filteredMembers.length === 0) {
+                html = '<p style="text-align:center; color:#888; padding:20px;">暂无成员</p>';
+            } else {
+                filteredMembers.forEach(member => {
+                    html += `
+                        <div class="admin-member-item">
+                            <div class="member-info">
+                                <div class="member-name">${member.nickname}</div>
+                                <div class="member-points">积分：${member.points} | 预产期：${member.dueDate}</div>
+                            </div>
+                            <button class="btn-add-points" onclick="showAddPointsModal(${member.id})">加分</button>
+                        </div>
+                    `;
+                });
+            }
+
+            document.getElementById('adminMembersList').innerHTML = html;
+        }
+
+        // 搜索成员
+        function searchMembers() {
+            loadAdminMembers();
+        }
+
+        // 显示加分弹窗
+        function showAddPointsModal(memberId) {
+            const members = JSON.parse(localStorage.getItem(STORAGE_KEYS.MEMBERS) || '[]');
+            const member = members.find(m => m.id === memberId);
+
+            if (member) {
+                document.getElementById('addPointsMember').value = member.nickname;
+                document.getElementById('addPointsMember').dataset.memberId = memberId;
+                document.getElementById('addPointsValue').value = '';
+                document.getElementById('addPointsReason').value = '';
+                document.getElementById('addPointsModal').classList.add('show');
+            }
+        }
+
+        // 关闭加分弹窗
+        function closeAddPointsModal() {
+            document.getElementById('addPointsModal').classList.remove('show');
+        }
+
+        // 提交加分
+        function submitAddPoints() {
+            const memberId = parseInt(document.getElementById('addPointsMember').dataset.memberId);
+            const points = parseInt(document.getElementById('addPointsValue').value);
+            const reason = document.getElementById('addPointsReason').value.trim();
+
+            if (!points || points <= 0) {
+                alert('请输入有效的分数');
+                return;
+            }
+
+            if (!reason) {
+                alert('请输入加分原因');
+                return;
+            }
+
+            const members = JSON.parse(localStorage.getItem(STORAGE_KEYS.MEMBERS) || '[]');
+            const memberIndex = members.findIndex(m => m.id === memberId);
+
+            if (memberIndex !== -1) {
+                // 更新积分
+                members[memberIndex].points += points;
+
+                // 添加记录
+                if (!members[memberIndex].history) {
+                    members[memberIndex].history = [];
+                }
+
+                members[memberIndex].history.unshift({
+                    date: new Date().toLocaleString('zh-CN'),
+                    points: points,
+                    reason: reason
+                });
+
+                // 保存数据
+                localStorage.setItem(STORAGE_KEYS.MEMBERS, JSON.stringify(members));
+
+                // 刷新当前用户数据
+                const currentUser = JSON.parse(localStorage.getItem(STORAGE_KEYS.CURRENT_USER));
+                if (currentUser && currentUser.id === memberId) {
+                    localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(members[memberIndex]));
+                }
+
+                alert(`成功为 ${members[memberIndex].nickname} 添加 ${points} 分！`);
+                closeAddPointsModal();
+                loadAdminMembers();
+            }
+        }
+
+        // 管理员退出登录
+        function adminLogout() {
+            showLoginSection();
+        }
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
